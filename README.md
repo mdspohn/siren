@@ -42,7 +42,7 @@ var exampleCommand = {
     
     }
     
-}
+};
 
 module.exports = exampleCommand;
 ```
