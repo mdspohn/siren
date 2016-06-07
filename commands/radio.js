@@ -12,7 +12,7 @@ var radio = {
         'skip',
         'list',
         'download',
-        'start'
+        'start',
     ],
         
     description: 'I can __play__ youtube audio and keep track of it in a __playlist__, ' +

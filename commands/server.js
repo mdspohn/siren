@@ -14,12 +14,11 @@ var server = {
         'exit',
         'id',
         'join',
-        'leave',
         'voice',
+        'leave',
         'disconnect',
-        'shutdown',
         'quit',
-        'stop'
+        'shutdown'
     ],
     
     description: 'Lets me __join__ and __leave__ voice channels, __listen__ when you\'re tired of ' +                'saying my name, __ignore__ users, and __leave the server__.',
@@ -102,27 +101,6 @@ var server = {
             
             return bot.respond(msg.channelId, 'Hmm, I don\'t see any Voice Channels I can join.');
 
-        }
-    },
-    
-    leave: function (msg, bot) {
-        if (bot.radio && bot.radio.ffmpeg) { bot.radio.ffmpeg.kill(); }
-        if (bot.currentVoiceChannel) {
-            bot.leaveVoiceChannel(bot.currentVoiceChannel);
-            bot.currentVoiceChannel = '';
-            
-            return bot.respond(msg.channelId, [
-                'Very well.',
-                'Ok then.',
-                'I\'m gone.'
-            ]);
-            
-        } else {
-            
-            bot.spotlight[msg.userId] = ['shutdown'];
-            
-            return bot.respond(msg.channelId, 'I\'m not in a voice channel. Did you want me to ' +
-                        '__leave the server__ completely? (You can answer this directly.)');
         }
     },
             
@@ -247,11 +225,34 @@ var server = {
             ]);
         }
     },
+    
+    leave: function (msg, bot) {
+        
+        if (bot.commands.radio.playing) { bot.commands.radio.playing = {}; }
+        
+        if (bot.currentVoiceChannel) {
+            bot.leaveVoiceChannel(bot.currentVoiceChannel);
+            bot.currentVoiceChannel = '';
+            
+            return bot.respond(msg.channelId, [
+                'Very well.',
+                'Ok then.',
+                'I\'m gone.'
+            ]);
+            
+        } else {
+            
+            bot.spotlight[msg.userId] = ['shutdown'];
+            
+            return bot.respond(msg.channelId, 'I\'m not in a voice channel. Did you want me to ' +
+                        '__leave the server__ completely? (You can answer this directly.)');
+        }
+    },
 
     exit: function (msg, bot) {
         
         function disconnect() {
-            if (bot.radio && bot.radio.ffmpeg) { bot.radio.ffmpeg.kill(); }
+            if (bot.commands.radio && bot.commands.radio.ffmpeg) { bot.commands.radio.ffmpeg.kill(); }
             if (bot.currentVoiceChannel) { bot.leaveVoiceChannel(bot.currentVoiceChannel); }
             bot.disconnect();
         }
@@ -292,12 +293,12 @@ var server = {
         } else if (matches('ignoring')) {
             return (matches('begin', 'start')) ?
                     this.ignore(msg, bot, ' ignoring') : this.ignore(msg, bot, 'ignoring');
+        } else if (matches('leave', 'disconnect', 'quit', 'shutdown')) {
+            return (matches('server')) ? this.exit(msg, bot) : this.leave(msg, bot);
         } else if (matches('unignore')) {
             return this.ignore(msg, bot, 'unignore');
         } else if (matches('listen', 'listening')) {
             return (matches('stop', 'dont')) ? this.listen(msg, bot, true) : this.listen(msg, bot);
-        } else if (matches('leave', 'disconnect', 'exit', 'quit')) {
-            return (matches('server')) ? this.exit(msg, bot) : this.leave(msg, bot);
         } else if (matches('join')) {
             return (matches('me', 'my')) ? this.join(msg, bot, true) : this.join(msg, bot);
         } else if (matches('shutdown')) {
