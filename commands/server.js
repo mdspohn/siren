@@ -293,8 +293,10 @@ var server = {
         } else if (matches('ignoring')) {
             return (matches('begin', 'start')) ?
                     this.ignore(msg, bot, ' ignoring') : this.ignore(msg, bot, 'ignoring');
-        } else if (matches('leave', 'disconnect', 'quit', 'shutdown')) {
+        } else if (matches('leave', 'disconnect', 'quit')) {
             return (matches('server')) ? this.exit(msg, bot) : this.leave(msg, bot);
+        } else if (matches('shutdown')) {
+            return this.exit(msg, bot);
         } else if (matches('unignore')) {
             return this.ignore(msg, bot, 'unignore');
         } else if (matches('listen', 'listening')) {
