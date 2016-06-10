@@ -150,12 +150,20 @@ var radio = {
             ]);
             
             radio.youtube(url, { filter: 'audioonly' })
+                .on('error', function (err) {
+                    console.log(err);
+                    return bot.respond(msg.channelId, [
+                        'Sorry, I couldn\'t get to that video.',
+                        'Actually, could you try again in a bit? I couldn\'t grab that one.',
+                        'I ran into some trouble grabbing that one.',
+                        'If that video exists, I can\'t see it right now.'
+                    ]);
+                })
                 .on('info', function (info) {
-                
                     if (info.title) {
-                        
+
                         if (info.length_seconds > 900) {
-                            
+
                             return bot.respond(msg.channelId, [
                                 'Er, that\'s kind of long, don\'t you think?',
                                 'Found it, but uh... I\'d rather not download something that long.',
@@ -163,9 +171,9 @@ var radio = {
                                 'Is there a shorter version you could link?',
                                 'I\'d be dead before that video finished downloading...'
                             ]);
-                            
+
                         } else {
-                        
+
                             bot.respond(msg.channelId, [
                                 'All set, ' + msg.user + '. It\'s on the playlist now.',
                                 'Found and added.',
@@ -181,11 +189,11 @@ var radio = {
                                 url: url,
                                 user: msg.user
                             });
-                            
+
                         }
-                        
+
                     } else if (err) {
-                        
+
                         return bot.respond(msg.channelId, [
                             'Hmm, I couldn\'t find it.',
                             'I\'m not seeing it, sorry.',
@@ -193,10 +201,11 @@ var radio = {
                             'I can\'t find it!',
                             'Spooky... I don\'t see it.'
                         ]);
-                        
+
                     }
-            
+
                 });
+            
         } else {
             
             return bot.respond(msg.channelId, [
@@ -244,9 +253,18 @@ var radio = {
     start: function (bot, cId, firstSong) {
         
         radio.youtube(radio.playlist[0].url, { filter: 'audioonly' })
-                    .pipe(radio.fs.createWriteStream('song.mp3'))
-                    .on('finish', function () {
-                        
+            .on('error', function (err) {
+                console.log(err);
+                return bot.respond(cId, [
+                    'Youtube is giving me a tough time right now. Could we try that ' +
+                        'again in a bit?',
+                    'Ran into some trouble starting. Mind trying again in a little while?',
+                    'I can\'t get it working. Could we take a break and try again in a few?'
+                ]);
+            })
+            .pipe(radio.fs.createWriteStream('song.mp3'))
+            .on('finish', function () {
+
                 if (firstSong) {
                     bot.respond(cId, [
                         'Up first, **' + radio.playlist[0].title + '**.',
@@ -257,7 +275,7 @@ var radio = {
                             radio.playlist[0].title + '**.'
                     ]);
                 }
-            
+
                 function handleStream(stream) {
                     radio.ffmpeg = radio.spawn('ffmpeg', [
                         '-i', 'song.mp3',
@@ -275,21 +293,21 @@ var radio = {
                         radio.next(bot, cId);
                     });
                 }
-            
+
                 if (radio.playlist[0]) {
 
                     radio.playing.user = radio.playlist[0].user;
                     radio.playing.title = radio.playlist[0].title;
 
                     radio.playlist.shift();
-                    
-                    
-                    
+
+
+
                     bot.getAudioContext({channel: bot.currentVoiceChannel, stereo: true}, handleStream);
 
-                    
+
                 }
-            
+
             });
     },
     
