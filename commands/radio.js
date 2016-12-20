@@ -303,7 +303,7 @@ var radio = {
 
 
 
-                    bot.getAudioContext({channel: bot.currentVoiceChannel, stereo: true}, handleStream);
+                    bot.getAudioContext({channelID: bot.currentVoiceChannel, stereo: true}, handleStream);
 
 
                 }
