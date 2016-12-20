@@ -9,6 +9,26 @@ var discord = require('discord.io'),
 // [array] trusted userIDs for permission checks (right click usernames in dev-mode discord client)
 bot.whiteList = ['87248537510764544', '84400622861811712', '87171783161036800'];
 
+// discord.io took this out
+bot.serverFromChannel = function(channelId) {
+    const sKeys  = Object.keys(bot.servers),
+          sCount = sKeys.length;
+    let   sId    = 0;
+    for (let i = 0; i < sCount; i++) {
+        const channels = bot.servers[sKeys[i]].channels,
+              cKeys    = Object.keys(channels),
+              cCount   = cKeys.length;
+        for (let j = 0; j < sCount; i++) {
+            if (cKeys[j] == channelId) {
+                sId = sKeys[i];
+                break;
+            }
+        }
+        if (sId != 0) break;
+    }
+    return sId;
+};
+
 // takes current channelId and a string or array of messages and responds with one of them
 bot.respond = function (channelId, messages) {
     var rList = messages || '',
