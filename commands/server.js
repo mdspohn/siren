@@ -71,7 +71,7 @@ var server = {
 
         if (voiceChannels[target]) {
             bot.spotlight[msg.userId] = false;
-            bot.currentVoiceChannel = voiceChannels[target];
+            bot.currentVoiceChannel = voiceChannels[target].id;
             bot.joinVoiceChannel(voiceChannels[target]);
             
             return bot.respond(msg.channelId, [
